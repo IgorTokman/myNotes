@@ -22,6 +22,10 @@
     notes[note.id - 1 ] = note;
   }
 
+  function createNote(note) {
+    notes.push(note);
+  }
+
   app.config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
         .state('list', {
@@ -30,7 +34,13 @@
         })
         .state('edit', {
           url: "/edit/:noteId",
-          templateUrl: "templates/edit.html"
+          templateUrl: "templates/edit.html",
+          controller: "EditCtrl"
+        })
+        .state('add', {
+          url: "/add",
+          templateUrl: "templates/edit.html",
+          controller: "AddCtrl"
         });
 
     $urlRouterProvider.otherwise("/list");
@@ -45,6 +55,18 @@
 
     $scope.save = function () {
       updateNote($scope.note);
+      $state.go("list");
+    }
+  });
+  app.controller("AddCtrl", function ($scope, $state) {
+    $scope.note = {
+      id: notes.length + 1,
+      title:  '',
+      description:  ''
+    }
+
+    $scope.save = function () {
+      createNote($scope.note);
       $state.go("list");
     }
   });
