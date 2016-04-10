@@ -24,6 +24,16 @@
   app.controller("ListCtrl", function ($scope, noteStore) {
     $scope.notes = noteStore.list();
 
+    $scope.reorder = false;
+
+    $scope.toggleReordering = function () {
+      $scope.reorder = !$scope.reorder;
+    }
+
+    $scope.move = function (note, from, to) {
+      noteStore.move(note, from, to);
+    }
+
     $scope.delete = function (nodeId) {
       noteStore.remove(nodeId);
     }
@@ -44,7 +54,7 @@
     $scope.title = "Add new note";
 
     $scope.note = {
-      id: noteStore.list().length + 1,
+      id: noteStore.list().length,
       title:  '',
       description:  ''
     }

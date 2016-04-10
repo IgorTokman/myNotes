@@ -14,11 +14,11 @@
             },
 
             get: function (id) {
-                return notes[id - 1];
+                return notes[id];
             },
 
             update: function (note) {
-                notes[note.id - 1 ] = note;
+                notes[note.id] = note;
                 persist();
             },
 
@@ -27,8 +27,14 @@
                 persist();
             },
 
+            move: function (note, from, to) {
+                notes.splice(from, 1);
+                notes.splice(to, 0, note);
+                persist();
+            },
+
             remove: function (id) {
-                notes.splice(id-1, 1);
+                notes.splice(id, 1);
                 persist();
             }
         }
