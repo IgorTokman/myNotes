@@ -1,31 +1,53 @@
-var app = angular.module('myNotes', ['ionic'])
+(function(){
+  var app = angular.module('myNotes', ['ionic'])
 
-app.controller("ListCtrl", function ($scope) {
-  $scope.notes = [
+  var notes = [
     {
+      id:   1,
       title:  "First Note",
       description:  "First Note"
     },
     {
+      id:   2,
       title:  "Second Note",
       description:  "Second Note"
     }
-  ]
-});
+  ];
 
-app.config(function ($stateProvider, $urlRouterProvider) {
-  $stateProvider.state('list', {
-    url: "/list",
-    templateUrl: "templates/list.html"
+  function getNote(id) {
+    return notes[id - 1];
+  }
+  
+  function updateNote(note) {
+    notes[note.id - 1 ] = note;
+  }
+
+  app.config(function ($stateProvider, $urlRouterProvider) {
+    $stateProvider
+        .state('list', {
+          url: "/list",
+          templateUrl: "templates/list.html"
+        })
+        .state('edit', {
+          url: "/edit/:noteId",
+          templateUrl: "templates/edit.html"
+        });
+
+    $urlRouterProvider.otherwise("/list");
   });
 
-  $stateProvider.state('edit', {
-    url: "/edit",
-    templateUrl: "templates/edit.html"
+  app.controller("ListCtrl", function ($scope) {
+    $scope.notes = notes;
   });
 
-  $urlRouterProvider.otherwise("/list");
-});
+  app.controller("EditCtrl", function ($scope, $state) {
+    $scope.note = angular.copy(getNote($state.params.noteId));
+
+    $scope.save = function () {
+      updateNote($scope.note);
+      $state.go("list");
+    }
+  });
 
   app.run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -38,3 +60,4 @@ app.config(function ($stateProvider, $urlRouterProvider) {
     }
   });
 })
+  }());
