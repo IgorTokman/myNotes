@@ -1,30 +1,5 @@
 (function(){
-  var app = angular.module('myNotes', ['ionic'])
-
-  var notes = [
-    {
-      id:   1,
-      title:  "First Note",
-      description:  "First Note"
-    },
-    {
-      id:   2,
-      title:  "Second Note",
-      description:  "Second Note"
-    }
-  ];
-
-  function getNote(id) {
-    return notes[id - 1];
-  }
-  
-  function updateNote(note) {
-    notes[note.id - 1 ] = note;
-  }
-
-  function createNote(note) {
-    notes.push(note);
-  }
+  var app = angular.module('myNotes', ['ionic']);
 
   app.config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
@@ -46,27 +21,28 @@
     $urlRouterProvider.otherwise("/list");
   });
 
-  app.controller("ListCtrl", function ($scope) {
-    $scope.notes = notes;
+  app.controller("ListCtrl", function ($scope, noteStore) {
+    $scope.notes = noteStore.list();
   });
 
-  app.controller("EditCtrl", function ($scope, $state) {
-    $scope.note = angular.copy(getNote($state.params.noteId));
+  app.controller("EditCtrl", function ($scope, $state, noteStore) {
+    $scope.note = angular.copy(noteStore.get($state.params.noteId));
 
     $scope.save = function () {
-      updateNote($scope.note);
+      noteStore.update($scope.note);
       $state.go("list");
     }
   });
-  app.controller("AddCtrl", function ($scope, $state) {
+  
+  app.controller("AddCtrl", function ($scope, $state, noteStore) {
     $scope.note = {
-      id: notes.length + 1,
+      id: noteStore.list().length + 1,
       title:  '',
       description:  ''
     }
 
     $scope.save = function () {
-      createNote($scope.note);
+      noteStore.create($scope.note);
       $state.go("list");
     }
   });
