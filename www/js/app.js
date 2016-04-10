@@ -23,9 +23,15 @@
 
   app.controller("ListCtrl", function ($scope, noteStore) {
     $scope.notes = noteStore.list();
+
+    $scope.delete = function (nodeId) {
+      noteStore.remove(nodeId);
+    }
   });
 
   app.controller("EditCtrl", function ($scope, $state, noteStore) {
+    $scope.title = "Edit note";
+
     $scope.note = angular.copy(noteStore.get($state.params.noteId));
 
     $scope.save = function () {
@@ -35,6 +41,8 @@
   });
   
   app.controller("AddCtrl", function ($scope, $state, noteStore) {
+    $scope.title = "Add new note";
+
     $scope.note = {
       id: noteStore.list().length + 1,
       title:  '',
