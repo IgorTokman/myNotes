@@ -1,9 +1,12 @@
 (function(){
-    var app = angular.module('myNotes');
     
+    var app = angular.module('myNotes');
+
+    //Performs the basic operations with note list
     app.factory('noteStore', function () {
         var notes = angular.fromJson(window.localStorage['notes'] || '[]');
 
+        //Saves notes in the window.localStorage
         function persist() {
             window.localStorage['notes'] = angular.toJson(notes);
         }
@@ -14,12 +17,19 @@
             },
 
             get: function (id) {
-                return notes[id];
+                for(var i=0; i< notes.length; i++)
+                    if(notes[i].id == id)
+                        return notes[i];
+
             },
 
             update: function (note) {
-                notes[note.id] = note;
-                persist();
+                for(var i=0; i< notes.length; i++)
+                    if(notes[i].id == note.id) {
+                        notes[i] = note;
+                        persist();
+                        return ;
+                    }
             },
 
             create: function (note) {
@@ -27,6 +37,7 @@
                 persist();
             },
 
+            //Realizes the list reordering
             move: function (note, from, to) {
                 notes.splice(from, 1);
                 notes.splice(to, 0, note);
@@ -34,8 +45,12 @@
             },
 
             remove: function (id) {
-                notes.splice(id, 1);
-                persist();
+                for(var i=0; i< notes.length; i++)
+                    if(notes[i].id == id) {
+                        notes.splice(i, 1);
+                        persist();
+                        return;
+                    }
             }
         }
     })
