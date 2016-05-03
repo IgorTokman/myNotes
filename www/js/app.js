@@ -1,24 +1,91 @@
-// Ionic Starter App
+(function(){
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic'])
+  //Starts the main app module
+  var app = angular.module('myNotes', ['ionic']);
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    if(window.cordova && window.cordova.plugins.Keyboard) {
-      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-      // for form inputs)
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+    //Realizes the routing system
+    app.config(function ($stateProvider, $urlRouterProvider) {
+      $stateProvider
+          .state('list', {
+            url: "/list",
+            templateUrl: "templates/list.html"
+          })
+          .state('edit', {
+            url: "/edit/:noteId",
+            templateUrl: "templates/edit.html",
+            controller: "EditCtrl"
+          })
+          .state('add', {
+            url: "/add",
+            templateUrl: "templates/edit.html",
+            controller: "AddCtrl"
+          });
+  
+      $urlRouterProvider.otherwise("/list");
+    });
 
-      // Don't remove this line unless you know what you are doing. It stops the viewport
-      // from snapping when text inputs are focused. Ionic handles this internally for
-      // a much nicer keyboard experience.
-      cordova.plugins.Keyboard.disableScroll(true);
-    }
-    if(window.StatusBar) {
-      StatusBar.styleDefault();
-    }
-  });
-})
+    //Controller for main page
+    //Executes the rendering, list reordering and deleting
+    app.controller("ListCtrl", function ($scope, noteStore) {
+      $scope.notes = noteStore.list();
+
+      //Stores the reordering mode
+      $scope.reorder = false;
+
+      $scope.toggleReordering = function () {
+        $scope.reorder = !$scope.reorder;
+      }
+
+      //Implements the list reordering
+      $scope.move = function (note, from, to) {
+        noteStore.move(note, from, to);
+      }
+  
+      $scope.delete = function (nodeId) {
+        noteStore.remove(nodeId);
+      }
+    });
+
+    //Updates the existing note
+    app.controller("EditCtrl", function ($scope, $state, noteStore) {
+      $scope.title = "Edit note";
+  
+      $scope.note = angular.copy(noteStore.get($state.params.noteId));
+  
+      $scope.save = function () {
+        noteStore.update($scope.note);
+        $state.go("list");
+      }
+    });
+
+    //Adds the new note into note list
+    app.controller("AddCtrl", function ($scope, $state, noteStore) {
+      $scope.title = "Add new note";
+
+      $scope.note = {
+        id: new Date().getTime().toString(),
+        title:  '',
+        description:  ''
+      }
+  
+      $scope.save = function () {
+        noteStore.create($scope.note);
+        $state.go("list");
+      }
+
+    });
+
+    //Performs the cordova settings
+    app.run(function($ionicPlatform) {
+    $ionicPlatform.ready(function() {
+      if(window.cordova && window.cordova.plugins.Keyboard) {
+        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        cordova.plugins.Keyboard.disableScroll(true);
+      }
+      if(window.StatusBar) {
+        StatusBar.styleDefault();
+      }
+    });
+  })
+
+}());
